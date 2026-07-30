@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QR Code SKM — SDN 10 Wonosobo</title>
+  <style>
+    @page { size: A4 portrait; margin: 0; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #e7eef1;
+      color: #12383a;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .sheet {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      padding: 22mm 20mm;
+      background: #fff;
+    }
+    .card {
+      min-height: 250mm;
+      overflow: hidden;
+      border: 1.5mm solid #0f766e;
+      border-radius: 8mm;
+      background: linear-gradient(145deg, #f0fdfa 0%, #fff 46%, #ecfdf5 100%);
+      box-shadow: 0 4mm 12mm rgba(15, 118, 110, .12);
+      text-align: center;
+    }
+    .header {
+      padding: 15mm 13mm 12mm;
+      background: #0f766e;
+      color: #fff;
+    }
+    .school { font-size: 13pt; font-weight: 700; letter-spacing: 1.5px; }
+    .title { margin: 5mm 0 0; font-size: 27pt; font-weight: 800; line-height: 1.08; }
+    .subtitle { margin: 4mm 0 0; font-size: 13pt; line-height: 1.45; }
+    .content { padding: 13mm 15mm 14mm; }
+    .scan-label {
+      display: inline-block;
+      margin: 0 0 5mm;
+      padding: 2.3mm 6mm;
+      border-radius: 999px;
+      background: #ccfbf1;
+      color: #115e59;
+      font-size: 10.5pt;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+    }
+    .qr-frame {
+      display: block;
+      width: 122mm;
+      height: 122mm;
+      max-width: 100%;
+      margin: 0 auto 8mm;
+      padding: 6mm;
+      border: 1mm solid #99f6e4;
+      border-radius: 5mm;
+      background: #fff;
+    }
+    .cta { margin: 0; font-size: 20pt; font-weight: 800; color: #134e4a; }
+    .instruction { margin: 3mm auto 7mm; max-width: 135mm; font-size: 12.5pt; line-height: 1.5; color: #315a5c; }
+    .url {
+      display: inline-block;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      padding: 3mm 4mm;
+      border-radius: 3mm;
+      background: #e6fffa;
+      color: #115e59;
+      font-size: 8.5pt;
+      font-weight: 700;
+    }
+    .footer { margin-top: 12mm; font-size: 9.5pt; line-height: 1.5; color: #477174; }
+    .footer strong { color: #0f766e; }
+    @media print {
+      body { background: #fff; }
+      .sheet { margin: 0; }
+      .card { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="sheet">
+    <section class="card" aria-label="QR Code Survei Kepuasan Masyarakat SDN 10 Wonosobo">
+      <header class="header">
+        <div class="school">SDN 10 WONOSOBO</div>
+        <h1 class="title">SURVEI KEPUASAN<br>MASYARAKAT</h1>
+        <p class="subtitle">Bantu kami meningkatkan mutu pelayanan sekolah.</p>
+      </header>
+      <div class="content">
+        <div class="scan-label">SCAN DI SINI</div>
+        <img class="qr-frame"
+          src="https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&amp;format=png&amp;margin=20&amp;color=0F766E&amp;data=https%3A%2F%2Fsdn10wonosobo.wonosobokab.go.id%2Fformulir%2Fsurvei-kepuasan-masyarakat"
+          alt="QR code menuju Survei Kepuasan Masyarakat SDN 10 Wonosobo">
+        <h2 class="cta">Pindai &amp; Isi Survei</h2>
+        <p class="instruction">Gunakan kamera ponsel untuk membuka survei. Pengisian hanya membutuhkan sekitar 3–5 menit.</p>
+        <div class="url">sdn10wonosobo.wonosobokab.go.id/formulir/survei-kepuasan-masyarakat</div>
+        <p class="footer"><strong>Terima kasih atas partisipasi Anda.</strong><br>Masukan Anda membantu SDN 10 Wonosobo memberikan pelayanan yang lebih baik.</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
