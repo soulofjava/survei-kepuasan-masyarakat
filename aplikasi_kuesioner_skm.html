@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuesioner SKM - Layanan Pendidikan SD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f0f4f8;
+            color: #1e293b;
+        }
+
+        .step-content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .rating-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .rating-input:checked + .rating-label {
+            background-color: #059669;
+            color: white;
+            border-color: #059669;
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            height: 300px;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50">
+
+    <!-- Chosen Palette: Nature Growth (Emerald 600 for primary, Slate for text, Sky 50 for bg) -->
+    
+    <!-- Application Structure Plan: 
+        1. Welcome Screen: Memberikan konteks pentingnya suara masyarakat bagi sekolah.
+        2. Personal Info: Data demografi dasar.
+        3. Thematic Survey Steps: 
+           - Step A: Administrasi & Prosedur (4 pertanyaan)
+           - Step B: Kualitas SDM & Etika (4 pertanyaan)
+           - Step C: Fasilitas & Produk (4 pertanyaan)
+           - Step D: Respon & Saran (4 pertanyaan + masukan teks)
+        4. Summary Dashboard: Visualisasi instan hasil penilaian user menggunakan Radar Chart sebelum final submit.
+        Structure ini dipilih untuk meningkatkan completion rate (tingkat penyelesaian) dengan memberikan variasi visual dan progress yang jelas.
+    -->
+
+    <!-- Visualization & Content Choices: 
+        1. Progress Tracker -> Goal: Inform -> Dynamic Progress Bar (Tailwind) -> Memberikan orientasi posisi pengisian.
+        2. Personal Data -> Goal: Organize -> Select & Radio Inputs -> Standarisasi data responden.
+        3. 1-4 Rating Scale -> Goal: Compare -> Interactive Grid Buttons -> Mempermudah pemilihan nilai tanpa mengetik.
+        4. Result Summary -> Goal: Inform -> Radar Chart (Chart.js) -> Memberikan visualisasi "keseimbangan" kualitas layanan menurut pandangan user.
+        CONFIRMATION: NO SVG used. NO Mermaid JS used. All visual components via HTML/Tailwind/Canvas.
+    -->
+
+    <div class="max-w-4xl mx-auto py-8 px-4">
+        <!-- Header Aplikasi -->
+        <header class="text-center mb-10">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-emerald-600 text-white rounded-2xl shadow-lg mb-4 text-3xl">
+                🏫
+            </div>
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-800">Survei Kepuasan Masyarakat (SKM)</h1>
+            <p class="text-slate-500 mt-2">Unit Pelayanan Publik Sekolah Dasar Negeri</p>
+        </header>
+
+        <!-- Container Utama -->
+        <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
+            
+            <!-- Progress Bar -->
+            <div id="progress-bar-container" class="hidden h-1.5 w-full bg-slate-100">
+                <div id="progress-bar-fill" class="h-full bg-emerald-500 transition-all duration-500" style="width: 0%"></div>
+            </div>
+
+            <div class="p-6 md:p-10">
+                
+                <!-- STEP 0: WELCOME -->
+                <div id="step-0" class="step-content active text-center">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-4">Selamat Datang</h2>
+                    <p class="text-slate-600 leading-relaxed mb-8">
+                        Survei ini bertujuan untuk mengukur tingkat kepuasan Anda terhadap layanan yang kami berikan. Jawaban Anda akan menjadi dasar perbaikan kualitas pendidikan di sekolah kami.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <span class="block text-2xl mb-1">⏱️</span>
+                            <span class="text-sm font-bold text-slate-700">3-5 Menit</span>
+                            <span class="block text-xs text-slate-400">Waktu Pengisian</span>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <span class="block text-2xl mb-1">🔒</span>
+                            <span class="text-sm font-bold text-slate-700">Anonim</span>
+                            <span class="block text-xs text-slate-400">Data Dijaga Rahasianya</span>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <span class="block text-2xl mb-1">📈</span>
+                            <span class="text-sm font-bold text-slate-700">Berdampak</span>
+                            <span class="block text-xs text-slate-400">Untuk Kemajuan Sekolah</span>
+                        </div>
+                    </div>
+                    <button onclick="navigate(1)" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-emerald-200">
+                        Mulai Isi Kuesioner
+                    </button>
+                </div>
+
+                <!-- STEP 1: PROFIL -->
+                <div id="step-1" class="step-content">
+                    <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center">
+                        <span class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center mr-3 text-sm">1</span>
+                        Profil Responden
+                    </h3>
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Jenis Kelamin</label>
+                            <div class="grid grid-cols-2 gap-4">
+                                <label class="flex items-center justify-center p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition">
+                                    <input type="radio" name="gender" value="L" class="mr-3 accent-emerald-600"> Laki-laki
+                                </label>
+                                <label class="flex items-center justify-center p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition">
+                                    <input type="radio" name="gender" value="P" class="mr-3 accent-emerald-600"> Perempuan
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Pekerjaan</label>
+                            <select id="pekerjaan" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
+                                <option>ASN/TNI/POLRI</option>
+                                <option>Pegawai Swasta</option>
+                                <option>Wiraswasta</option>
+                                <option>Petani/Buruh</option>
+                                <option>Ibu Rumah Tangga</option>
+                                <option>Lainnya</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Hubungan dengan Sekolah</label>
+                            <select id="hubungan" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
+                                <option>Orang Tua / Wali Murid</option>
+                                <option>Komite Sekolah</option>
+                                <option>Masyarakat Sekitar / Tamu</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-10 flex gap-4">
+                        <button onclick="navigate(0)" class="w-1/3 py-4 text-slate-400 font-bold hover:text-slate-600">Kembali</button>
+                        <button onclick="navigate(2)" class="flex-grow py-4 bg-emerald-600 text-white font-bold rounded-2xl shadow-lg">Lanjutkan</button>
+                    </div>
+                </div>
+
+                <!-- STEP 2: ADMINISTRASI & PERSYARATAN -->
+                <div id="step-2" class="step-content">
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Sistem & Prosedur</h3>
+                    <p class="text-sm text-slate-500 mb-8 italic">Nilai: 1 (Buruk) s/d 4 (Sangat Baik)</p>
+                    
+                    <div class="space-y-8" id="questions-container-1">
+                        <!-- Questions will be injected here for Step 2 -->
+                    </div>
+
+                    <div class="mt-10 flex gap-4">
+                        <button onclick="navigate(1)" class="w-1/3 py-4 text-slate-400 font-bold">Kembali</button>
+                        <button onclick="navigate(3)" class="flex-grow py-4 bg-emerald-600 text-white font-bold rounded-2xl shadow-lg">Lanjutkan</button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: SDM & PERILAKU -->
+                <div id="step-3" class="step-content">
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Kompetensi & Perilaku Petugas</h3>
+                    <p class="text-sm text-slate-500 mb-8 italic">Seberapa profesional dan ramah staf kami melayani Anda?</p>
+                    
+                    <div class="space-y-8" id="questions-container-2">
+                        <!-- Questions for Step 3 -->
+                    </div>
+
+                    <div class="mt-10 flex gap-4">
+                        <button onclick="navigate(2)" class="w-1/3 py-4 text-slate-400 font-bold">Kembali</button>
+                        <button onclick="navigate(4)" class="flex-grow py-4 bg-emerald-600 text-white font-bold rounded-2xl shadow-lg">Lanjutkan</button>
+                    </div>
+                </div>
+
+                <!-- STEP 4: FASILITAS & PENGADUAN -->
+                <div id="step-4" class="step-content">
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Fasilitas & Penanganan Keluhan</h3>
+                    <p class="text-sm text-slate-500 mb-8 italic">Berikan masukan terkait lingkungan sekolah.</p>
+                    
+                    <div class="space-y-8" id="questions-container-3">
+                        <!-- Questions for Step 4 -->
+                    </div>
+
+                    <div class="mt-8 border-t border-slate-100 pt-8">
+                        <label class="block text-sm font-bold text-slate-700 mb-3">Saran tambahan untuk kemajuan sekolah:</label>
+                        <textarea id="saran-teks" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl h-24 outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Contoh: Perbaikan fasilitas toilet atau peningkatkan literasi perpustakaan..."></textarea>
+                    </div>
+
+                    <div class="mt-10 flex gap-4">
+                        <button onclick="navigate(3)" class="w-1/3 py-4 text-slate-400 font-bold">Kembali</button>
+                        <button onclick="generateSummary()" class="flex-grow py-4 bg-orange-500 text-white font-bold rounded-2xl shadow-lg hover:bg-orange-600 transition">Lihat Ringkasan</button>
+                    </div>
+                </div>
+
+                <!-- STEP 5: RINGKASAN & SUBMIT -->
+                <div id="step-5" class="step-content">
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold text-slate-800">Ringkasan Penilaian Anda</h3>
+                        <p class="text-slate-500">Berikut adalah profil kepuasan yang Anda berikan.</p>
+                    </div>
+
+                    <div class="chart-container mb-8">
+                        <canvas id="userSummaryChart"></canvas>
+                    </div>
+
+                    <div class="bg-emerald-50 p-6 rounded-2xl mb-8">
+                        <p class="text-sm text-emerald-800 text-center">
+                            Terima kasih telah memberikan penilaian yang jujur. Dengan menekan tombol <b>Kirim Sekarang</b>, data Anda akan tersimpan secara anonim dalam sistem kami.
+                        </p>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <button onclick="navigate(4)" class="w-1/3 py-4 text-slate-400 font-bold">Revisi Jawaban</button>
+                        <button onclick="finishSurvey()" class="flex-grow py-4 bg-emerald-600 text-white font-bold rounded-2xl shadow-lg hover:bg-emerald-700 transition">Kirim Sekarang</button>
+                    </div>
+                </div>
+
+                <!-- STEP 6: SUCCESS -->
+                <div id="step-6" class="step-content text-center py-10">
+                    <div class="w-24 h-24 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-5xl mx-auto mb-6">
+                        ✓
+                    </div>
+                    <h2 class="text-3xl font-bold text-slate-800 mb-4">Terima Kasih!</h2>
+                    <p class="text-slate-600 max-w-sm mx-auto mb-10">
+                        Kontribusi Anda sangat berharga bagi peningkatan mutu pelayanan di sekolah kami.
+                    </p>
+                    <button onclick="location.reload()" class="px-8 py-3 border-2 border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition">
+                        Isi Survei Lagi
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <footer class="mt-12 text-center text-slate-400 text-xs">
+            <p>&copy; 2026 Portal Kepuasan Masyarakat - Unit Layanan Pendidikan</p>
+            <p class="mt-1">Instrumen Survei sesuai Peraturan Menteri PANRB No. 14 Tahun 2017</p>
+        </footer>
+    </div>
+
+    <script>
+        const questionData = [
+            { id: 1, cat: 1, text: "Kemudahan prosedur administrasi (PPDB, mutasi, surat keterangan)." },
+            { id: 2, cat: 1, text: "Kejelasan alur pelayanan dari awal hingga selesai." },
+            { id: 3, cat: 1, text: "Kejelasan informasi mengenai dokumen persyaratan yang dibutuhkan." },
+            { id: 4, cat: 1, text: "Kecepatan petugas dalam merespons kebutuhan administrasi." },
+            
+            { id: 5, cat: 2, text: "Kemampuan guru dalam mengajar dan membimbing siswa." },
+            { id: 6, cat: 2, text: "Keterampilan staf tata usaha dalam mengelola administrasi." },
+            { id: 7, cat: 2, text: "Kesopanan dan keramahan guru serta staf sekolah." },
+            { id: 8, cat: 2, text: "Kedisiplinan seluruh warga sekolah (Guru dan Karyawan)." },
+            
+            { id: 9, cat: 3, text: "Kebersihan dan kenyamanan ruang kelas, toilet, dan halaman." },
+            { id: 10, cat: 3, text: "Ketersediaan fasilitas penunjang (Perpustakaan, UKS, Kantin)." },
+            { id: 11, cat: 3, text: "Respon sekolah terhadap keluhan, saran, atau kritik." },
+            { id: 12, cat: 3, text: "Transparansi mengenai kepastian layanan gratis / biaya." }
+        ];
+
+        let currentStep = 0;
+        let userAnswers = {};
+        let summaryChart = null;
+
+        // Inisialisasi Pertanyaan
+        function initQuestions() {
+            const containers = [
+                document.getElementById('questions-container-1'),
+                document.getElementById('questions-container-2'),
+                document.getElementById('questions-container-3')
+            ];
+
+            questionData.forEach(q => {
+                const html = `
+                    <div class="question-block">
+                        <p class="font-semibold text-slate-700 mb-4">${q.id}. ${q.text}</p>
+                        <div class="grid grid-cols-4 gap-2 md:gap-4">
+                            ${[1,2,3,4].map(val => `
+                                <div class="relative">
+                                    <input type="radio" name="q${q.id}" id="q${q.id}_${val}" value="${val}" class="rating-input absolute opacity-0" onchange="saveAnswer(${q.id}, ${val})">
+                                    <label for="q${q.id}_${val}" class="rating-label rating-btn block text-center py-3 border-2 border-slate-100 rounded-xl cursor-pointer text-slate-400 font-bold hover:border-emerald-200">
+                                        ${val}
+                                    </label>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="flex justify-between text-[10px] text-slate-400 px-1 mt-2 font-bold uppercase tracking-tighter">
+                            <span>Buruk</span>
+                            <span>Sangat Baik</span>
+                        </div>
+                    </div>
+                `;
+                containers[q.cat - 1].innerHTML += html;
+            });
+        }
+
+        function saveAnswer(id, val) {
+            userAnswers[id] = val;
+        }
+
+        function navigate(step) {
+            document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(`step-${step}`).classList.add('active');
+            
+            const progress = document.getElementById('progress-bar-container');
+            const fill = document.getElementById('progress-bar-fill');
+            
+            if (step > 0 && step < 6) {
+                progress.classList.remove('hidden');
+                fill.style.width = `${(step / 5) * 100}%`;
+            } else {
+                progress.classList.add('hidden');
+            }
+            
+            currentStep = step;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function generateSummary() {
+            // Validasi sederhana
+            if (Object.keys(userAnswers).length < questionData.length) {
+                alert("Mohon isi semua pertanyaan penilaian sebelum melihat ringkasan.");
+                return;
+            }
+
+            navigate(5);
+
+            const ctx = document.getElementById('userSummaryChart').getContext('2d');
+            
+            // Hitung rata-rata per kategori
+            const cat1 = (userAnswers[1] + userAnswers[2] + userAnswers[3] + userAnswers[4]) / 4;
+            const cat2 = (userAnswers[5] + userAnswers[6] + userAnswers[7] + userAnswers[8]) / 4;
+            const cat3 = (userAnswers[9] + userAnswers[10] + userAnswers[11] + userAnswers[12]) / 4;
+
+            if (summaryChart) summaryChart.destroy();
+
+            summaryChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Administrasi', 'Kompetensi SDM', 'Fasilitas & Layanan'],
+                    datasets: [{
+                        label: 'Penilaian Anda',
+                        data: [cat1, cat2, cat3],
+                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                        borderColor: '#10b981',
+                        pointBackgroundColor: '#10b981',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 4,
+                            ticks: { stepSize: 1, display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function finishSurvey() {
+            const btn = event.target;
+            btn.innerHTML = '<span class="inline-block animate-spin mr-2">⏳</span> Mengirim Data...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                navigate(6);
+            }, 2000);
+        }
+
+        window.onload = initQuestions;
+    </script>
+</body>
+</html>
